@@ -2,6 +2,9 @@
 
 Super tiny and simple language with JS backend
 
+## Building
+Just run gradle task `assemble` and pick an archive with CLI from build folder
+
 ## Constructions
 Flange supports only 3 kinds of statements:
 - assignment
@@ -23,7 +26,7 @@ print(x)
 - while loop
 ```javascript
 while (42) {
-    x = input()
+    y = input(),
     print(y + 4)
 }
 ```
