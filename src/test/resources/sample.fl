@@ -1,0 +1,6 @@
+x = input()
+while (x /= 0) {
+    y = x * 2,
+    print(y),
+    x = input()
+}
