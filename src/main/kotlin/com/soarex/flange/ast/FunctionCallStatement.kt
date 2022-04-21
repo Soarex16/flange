@@ -1,6 +1,7 @@
 package com.soarex.flange.ast
 
 import com.soarex.flange.SyntaxVisitor
+import com.soarex.flange.indent
 
 data class FunctionCallStatement(val function: FunctionCallExpression): Statement {
     override val children: List<SyntaxNode>
@@ -10,4 +11,11 @@ data class FunctionCallStatement(val function: FunctionCallExpression): Statemen
         super.accept(visitor)
         return visitor.visitFunctionCallStatement(this)
     }
+
+    override fun toString() = """
+    |${javaClass.simpleName}(
+    |    function = (
+    |${indent(function.toString(), 2)}
+    |    )
+    |)""".trimMargin()
 }

@@ -1,0 +1,59 @@
+FLangeProgram(
+    statements = (
+        AssignmentStatement(
+            Identifier(x)
+            FunctionCallExpression(
+                Identifier(input)
+                arguments = (
+                )
+            )
+        ),
+        WhileStatement(
+            while = (
+                BinaryExpression(
+                    left = (
+                        Identifier(x)
+                    )
+                    op = NOT_EQUAL
+                    right = (
+                        NumberLiteral(0)
+                    )
+                )
+            )
+            do = (
+                CompoundStatement(
+                    AssignmentStatement(
+                        Identifier(y)
+                        BinaryExpression(
+                            left = (
+                                Identifier(x)
+                            )
+                            op = MUL
+                            right = (
+                                NumberLiteral(2)
+                            )
+                        )
+                    ),
+                    FunctionCallStatement(
+                        function = (
+                            FunctionCallExpression(
+                                Identifier(print)
+                                arguments = (
+                                    Identifier(y)
+                                )
+                            )
+                        )
+                    ),
+                    AssignmentStatement(
+                        Identifier(x)
+                        FunctionCallExpression(
+                            Identifier(input)
+                            arguments = (
+                            )
+                        )
+                    )
+                )
+            )
+        )
+    )
+)

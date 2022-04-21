@@ -2,14 +2,15 @@ package com.soarex.flange.js
 
 import com.soarex.flange.SyntaxVisitorBase
 import com.soarex.flange.ast.*
+import com.soarex.flange.indent
 
 class JsTranspilerImpl: JsTranspiler {
-    override fun transform(program: FLangeProgram): String {
-        return FLangeToJsTransformer().visit(program)
+    override fun transform(program: FLangeProgram, mapper: SymbolMapper): String {
+        return FLangeToJsTransformer(mapper).visit(program)
     }
 }
 
-private class FLangeToJsTransformer: SyntaxVisitorBase<String>() {
+private class FLangeToJsTransformer(val mapper: SymbolMapper): SyntaxVisitorBase<String>() {
     private class VariableDeclarationsCollector: SyntaxVisitorBase<Unit>() {
         private val collectedDeclarations: MutableSet<String> = mutableSetOf()
 
@@ -79,7 +80,7 @@ private class FLangeToJsTransformer: SyntaxVisitorBase<String>() {
     }
 
     override fun visitFunctionCallExpression(node: FunctionCallExpression): String {
-        val functionName = visit(node.functionName)
+        val functionName = mapper(visit(node.functionName))
         val args = node.arguments.joinToString(", ") { visit(it) }
         return "${functionName}($args)"
     }
@@ -108,6 +109,4 @@ private class FLangeToJsTransformer: SyntaxVisitorBase<String>() {
         val inner = visit(node.innerExpression)
         return "(${node.operator.op}${inner})"
     }
-
-    private fun indent(code: String): String = "    " + code.replace("\n", "\n    ")
 }

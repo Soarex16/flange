@@ -1,0 +1,8 @@
+FLangeProgram(
+    statements = (
+        AssignmentStatement(
+            Identifier(x)
+            NumberLiteral(4)
+        )
+    )
+)

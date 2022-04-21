@@ -42,22 +42,29 @@ function_call_statement
     : function_call_expression
     ;
 
-//expression
-//    : expression_1
-//    ;
-
-// TODO: remove logical operators associaitivity
 expression
-    : atom                                                                      #atomic
-    | function_call_expression                                                  #function_call
-    | <assoc=right> lhs=expression operator=POW rhs=expression                  #binary_expression
-    | operator=MINUS expression                                                 #unary_expression
-    | <assoc=left> lhs=expression operator=(MUL | DIV) rhs=expression           #binary_expression
-    | <assoc=left> lhs=expression operator=(PLUS | MINUS) rhs=expression        #binary_expression
-    | lhs=expression operator=(OP_LT | OP_GT | OP_EQ | OP_NE) rhs=expression    #binary_expression
-    | operator=OP_NOT expression                                                #unary_expression
-    | <assoc=right> lhs=expression operator=OP_AND rhs=expression               #binary_expression
-    | <assoc=right> lhs=expression operator=OP_OR rhs=expression                #binary_expression
+    : assocative_expression                                                                         #assoc_expr
+    | comparison_expression                                                                         #comparison_expr
+    | operator=OP_NOT expression                                                                    #unary_expr
+    | <assoc=right> lhs=expression operator=OP_AND rhs=expression                                   #binary_expr
+    | <assoc=right> lhs=expression operator=OP_OR rhs=expression                                    #binary_expr
+    ;
+
+assocative_expression
+    : atom                                                                                          #atomic_expr
+    | function_call_expression                                                                      #function_call_expr
+    | <assoc=right> lhs=assocative_expression operator=POW rhs=assocative_expression                #assoc_binary_expr
+    | operator=MINUS inner=assocative_expression                                                    #assoc_unary_expr
+    | <assoc=left> lhs=assocative_expression operator=(MUL | DIV) rhs=assocative_expression         #assoc_binary_expr
+    | <assoc=left> lhs=assocative_expression operator=(PLUS | MINUS) rhs=assocative_expression      #assoc_binary_expr
+    // here be comparison
+    | operator=OP_NOT inner=assocative_expression                                                   #assoc_unary_expr
+    | <assoc=right> lhs=assocative_expression operator=OP_AND rhs=assocative_expression             #assoc_binary_expr
+    | <assoc=right> lhs=assocative_expression operator=OP_OR rhs=assocative_expression              #assoc_binary_expr
+    ;
+
+comparison_expression
+    : lhs=assocative_expression operator=(OP_LT | OP_GT | OP_EQ | OP_NE) rhs=assocative_expression
     ;
 
 function_call_expression

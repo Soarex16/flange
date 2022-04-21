@@ -10,4 +10,6 @@ data class NumberLiteral(val value: Int) : Expression {
         super.accept(visitor)
         return visitor.visitNumberLiteral(this)
     }
+
+    override fun toString() = "${javaClass.simpleName}($value)"
 }

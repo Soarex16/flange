@@ -10,4 +10,6 @@ data class Identifier(val name: String) : Expression {
         super.accept(visitor)
         return visitor.visitIdentifier(this)
     }
+
+    override fun toString() = "${javaClass.simpleName}($name)"
 }

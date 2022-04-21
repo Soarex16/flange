@@ -1,0 +1,39 @@
+FLangeProgram(
+    statements = (
+        AssignmentStatement(
+            Identifier(x)
+            BinaryExpression(
+                left = (
+                    BinaryExpression(
+                        left = (
+                            UnaryExpression(
+                                op = MINUS
+                                expr = (
+                                    UnaryExpression(
+                                        op = MINUS
+                                        expr = (
+                                            UnaryExpression(
+                                                op = MINUS
+                                                expr = (
+                                                    NumberLiteral(4)
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                        op = PLUS
+                        right = (
+                            NumberLiteral(2)
+                        )
+                    )
+                )
+                op = MINUS
+                right = (
+                    NumberLiteral(3)
+                )
+            )
+        )
+    )
+)

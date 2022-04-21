@@ -14,11 +14,13 @@ repositories {
 }
 
 dependencies {
-    implementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    implementation("org.junit.jupiter:junit-jupiter:5.8.2")
     testImplementation(kotlin("test"))
 
     antlr("org.antlr:antlr4:4.9.3")
     implementation("com.github.ajalt.clikt:clikt:3.4.0")
+    implementation("org.graalvm.js:js:22.0.0")
+    implementation("org.graalvm.js:js-scriptengine:22.0.0")
 }
 
 application {
@@ -35,6 +37,7 @@ tasks.withType<KotlinCompile> {
 }
 
 tasks.generateGrammarSource {
-    outputDirectory = File("${project.buildDir}/generated-src/antlr/main/com/soarex/flange/parser")
+    val grammarOutputDir = "generated-src/antlr/main/com/soarex/flange/parser"
+    outputDirectory = File("${project.buildDir}/$grammarOutputDir")
     arguments.plusAssign(listOf("-no-listener", "-visitor"))
 }

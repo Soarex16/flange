@@ -83,15 +83,35 @@ private class AntlrToFLangeVisitor: AntlrFLangeParserBaseVisitor<SyntaxNode>() {
         return FunctionCallExpression(functionName, arguments)
     }
 
-    override fun visitBinary_expression(ctx: AntlrFLangeParser.Binary_expressionContext): BinaryExpression {
+    override fun visitBinary_expr(ctx: com.soarex.flange.parser.FLangeParser.Binary_exprContext): BinaryExpression {
         val lhs = visit(ctx.lhs) as Expression
         val rhs = visit(ctx.rhs) as Expression
         val operator = parseBinaryOperator(ctx.operator.text)
         return BinaryExpression(lhs, operator, rhs)
     }
 
-    override fun visitUnary_expression(ctx: AntlrFLangeParser.Unary_expressionContext): UnaryExpression {
+    override fun visitAssoc_binary_expr(ctx: com.soarex.flange.parser.FLangeParser.Assoc_binary_exprContext): BinaryExpression {
+        val lhs = visit(ctx.lhs) as Expression
+        val rhs = visit(ctx.rhs) as Expression
+        val operator = parseBinaryOperator(ctx.operator.text)
+        return BinaryExpression(lhs, operator, rhs)
+    }
+
+    override fun visitComparison_expression(ctx: com.soarex.flange.parser.FLangeParser.Comparison_expressionContext): BinaryExpression {
+        val lhs = visit(ctx.lhs) as Expression
+        val rhs = visit(ctx.rhs) as Expression
+        val operator = parseBinaryOperator(ctx.operator.text)
+        return BinaryExpression(lhs, operator, rhs)
+    }
+
+    override fun visitUnary_expr(ctx: com.soarex.flange.parser.FLangeParser.Unary_exprContext): UnaryExpression {
         val innerExpression = visit(ctx.expression()) as Expression
+        val operator = parseUnaryOperator(ctx.operator.text)
+        return UnaryExpression(operator, innerExpression)
+    }
+
+    override fun visitAssoc_unary_expr(ctx: com.soarex.flange.parser.FLangeParser.Assoc_unary_exprContext): UnaryExpression {
+        val innerExpression = visit(ctx.inner) as Expression
         val operator = parseUnaryOperator(ctx.operator.text)
         return UnaryExpression(operator, innerExpression)
     }
