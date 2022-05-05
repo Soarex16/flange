@@ -1,0 +1,12 @@
+{
+    x = 12,
+    if (x == 12) then {
+        x = 13
+    },
+
+    if (x == 13) then {
+    } else {
+        x = 12,
+        print(x)
+    }
+}

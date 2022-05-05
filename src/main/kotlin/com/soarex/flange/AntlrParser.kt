@@ -8,6 +8,60 @@ import com.soarex.flange.parser.FLangeLexer as AntlrFLangeLexer
 import com.soarex.flange.parser.FLangeParser as AntlrFLangeParser
 import com.soarex.flange.parser.FLangeParserBaseVisitor as AntlrFLangeParserBaseVisitor
 
+class FLangeAntlrParser : FLangeParser {
+    override fun parse(input: String): FLangeProgram {
+        val charsStream = CharStreams.fromString(input)
+        val lexer = AntlrFLangeLexer(charsStream)
+        val tokens = CommonTokenStream(lexer)
+        val parser = AntlrFLangeParser(tokens)
+        val rootNode = parser.program()
+        return AntlrToFlangeTranslator().visitProgram(rootNode)
+    }
+}
+
+private class AntlrToFlangeTranslator(
+    private val statementTranslator: AntlrToFlangeStatementTranslator = AntlrToFlangeStatementTranslator()
+) : AntlrFLangeParserBaseVisitor<FLangeProgram>() {
+    override fun visitProgram(ctx: AntlrFLangeParser.ProgramContext): FLangeProgram {
+        val statements = ctx.statement().map { statementTranslator.visit(it) }
+        return FLangeProgram(statements)
+    }
+}
+
+private class AntlrToFlangeStatementTranslator(
+    private val expressionTranslator: AntlrToFlangeExpressionTranslator = AntlrToFlangeExpressionTranslator()
+) : AntlrFLangeParserBaseVisitor<Statement>() {
+    override fun visitCompound_statement(ctx: AntlrFLangeParser.Compound_statementContext): CompoundStatement {
+        val statements = ctx.statement().map { visit(it) as Statement }
+        return CompoundStatement(statements)
+    }
+
+    override fun visitFunction_call_statement(ctx: AntlrFLangeParser.Function_call_statementContext): FunctionCallStatement {
+        val functionExpr = expressionTranslator.visitFunction_call_expression(ctx.function_call_expression())
+        return FunctionCallStatement(functionExpr)
+    }
+
+    override fun visitConditional_statement(ctx: AntlrFLangeParser.Conditional_statementContext): ConditionalStatement {
+        val condition = expressionTranslator.visit(ctx.condition)
+        val thenBranch = visitCompound_statement(ctx.then_statement)
+        val elseBranch = if (ctx.else_statement != null) visitCompound_statement(ctx.else_statement) else null
+
+        return ConditionalStatement(condition, thenBranch, elseBranch)
+    }
+
+    override fun visitWhile_loop_statement(ctx: AntlrFLangeParser.While_loop_statementContext): WhileStatement {
+        val condition = expressionTranslator.visit(ctx.condition)
+        val body = visitCompound_statement(ctx.body)
+        return WhileStatement(condition, body)
+    }
+
+    override fun visitAssignment_statement(ctx: AntlrFLangeParser.Assignment_statementContext): AssignmentStatement {
+        val variableName = expressionTranslator.visitIdentifier(ctx.identifier())
+        val value = expressionTranslator.visit(ctx.expression())
+        return AssignmentStatement(variableName, value)
+    }
+}
+
 private val BINARY_OPERATORS_TABLE: Map<String, BinaryOperator> = mapOf(
     "^" to BinaryOperator.POW,
     "*" to BinaryOperator.MUL,
@@ -29,55 +83,9 @@ private val UNARY_OPERATORS_TABLE: Map<String, UnaryOperator> = mapOf(
     "!" to UnaryOperator.NOT
 )
 
-class FLangeAntlrParser: FLangeParser {
-    override fun parse(input: String): FLangeProgram {
-        val charsStream = CharStreams.fromString(input)
-        val lexer = AntlrFLangeLexer(charsStream)
-        val tokens = CommonTokenStream(lexer)
-        val parser = AntlrFLangeParser(tokens)
-        val rootNode = parser.program()
-        return AntlrToFLangeVisitor().visitProgram(rootNode)
-    }
-}
-
-private class AntlrToFLangeVisitor: AntlrFLangeParserBaseVisitor<SyntaxNode>() {
-    override fun visitProgram(ctx: AntlrFLangeParser.ProgramContext): FLangeProgram {
-        val statements = ctx.statement().map { visit(it) as Statement }
-        return FLangeProgram(statements)
-    }
-
-    override fun visitCompound_statement(ctx: AntlrFLangeParser.Compound_statementContext): CompoundStatement {
-        val statements = ctx.statement().map { visit(it) as Statement }
-        return CompoundStatement(statements)
-    }
-
-    override fun visitFunction_call_statement(ctx: AntlrFLangeParser.Function_call_statementContext): FunctionCallStatement {
-        val functionExpr = visit(ctx.function_call_expression()) as FunctionCallExpression
-        return FunctionCallStatement(functionExpr)
-    }
-
-    override fun visitConditional_statement(ctx: AntlrFLangeParser.Conditional_statementContext): ConditionalStatement {
-        val condition = visit(ctx.condition) as Expression
-        val thenBranch = visit(ctx.then_statement) as CompoundStatement
-        val elseBranch = visit(ctx.else_statement) as? CompoundStatement
-
-        return ConditionalStatement(condition, thenBranch, elseBranch)
-    }
-
-    override fun visitWhile_loop_statement(ctx: AntlrFLangeParser.While_loop_statementContext): WhileStatement {
-        val condition = visit(ctx.condition) as Expression
-        val body = visit(ctx.body) as CompoundStatement
-        return WhileStatement(condition, body)
-    }
-
-    override fun visitAssignment_statement(ctx: AntlrFLangeParser.Assignment_statementContext): AssignmentStatement {
-        val variableName = visit(ctx.identifier()) as Identifier
-        val value = visit(ctx.expression()) as Expression
-        return AssignmentStatement(variableName, value)
-    }
-
+private class AntlrToFlangeExpressionTranslator : AntlrFLangeParserBaseVisitor<Expression>() {
     override fun visitFunction_call_expression(ctx: AntlrFLangeParser.Function_call_expressionContext): FunctionCallExpression {
-        val functionName = visit(ctx.identifier()) as Identifier
+        val functionName = visitIdentifier(ctx.identifier())
         val arguments = ctx.arguments.expression().map { visit(it) as Expression }
 
         return FunctionCallExpression(functionName, arguments)

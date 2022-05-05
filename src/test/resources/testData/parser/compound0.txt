@@ -1,0 +1,70 @@
+FLangeProgram(
+    statements = (
+        CompoundStatement(
+            AssignmentStatement(
+                Identifier(x)
+                NumberLiteral(12)
+            ),
+            ConditionalStatement(
+                if = (
+                    BinaryExpression(
+                        left = (
+                            Identifier(x)
+                        )
+                        op = EQUAL
+                        right = (
+                            NumberLiteral(12)
+                        )
+                    )
+                )
+                then = (
+                    CompoundStatement(
+                        AssignmentStatement(
+                            Identifier(x)
+                            NumberLiteral(13)
+                        )
+                    )
+                )
+                else = (
+                    null
+                )
+            ),
+            ConditionalStatement(
+                if = (
+                    BinaryExpression(
+                        left = (
+                            Identifier(x)
+                        )
+                        op = EQUAL
+                        right = (
+                            NumberLiteral(13)
+                        )
+                    )
+                )
+                then = (
+                    CompoundStatement(
+        
+                    )
+                )
+                else = (
+                    CompoundStatement(
+                        AssignmentStatement(
+                            Identifier(x)
+                            NumberLiteral(12)
+                        ),
+                        FunctionCallStatement(
+                            function = (
+                                FunctionCallExpression(
+                                    Identifier(print)
+                                    arguments = (
+                                        Identifier(x)
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        )
+    )
+)
